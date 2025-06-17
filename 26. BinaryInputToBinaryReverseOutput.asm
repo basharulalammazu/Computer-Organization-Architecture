@@ -4,6 +4,10 @@
 
 
 
+; Question:
+; Write a program that takes a single digit input (0–9) from the user, converts it to binar, and stores the result in a register. (Use SHL, RCR, and loop logic.)
+
+
 
 .MODEL SMALL
 .STACK 100H
@@ -16,54 +20,55 @@
     MAIN PROC   
         MOV AX, @DATA  
         MOV DS, AX                
+         
+        MOV BX, 0  ; TO HOLD THE FINAL INT
+        MOV CX, 0
         
-        
+        ; SHOW THE INPUT TEXT
         MOV AH, 9
         LEA DX, TXT
         INT 21H
-        
-        MOV BX,0
-         
-        
+            
         INPUT:
             MOV AH, 1
-            INT 21H
+            INT 21H  
+            
+            
             CMP AL, 13
             JE OUTPUT
             
-            SUB AL, 30H
+            SUB AL, '0'
             SHL BX, 1
-            OR BL, AL
+            OR BL, AL 
             LOOP INPUT
-        
-        
-        OUTPUT:  
+            
+        OUTPUT:
             MOV AH, 9
             LEA DX, NEWLINE
             INT 21H
-            MOV CX, 16
             
-        OUTPUT_1:
+            MOV CX, 16
+        
+        REVERSE_:
             SHR BX, 1
-            JNC ZERO
+            JNC PRINT_ZERO
             
             MOV AH, 2
-            MOV DL,'1'
-            INT 21H
+            MOV DL, "1"
+            INT 21H   
             
             JMP LOOP_
             
-        ZERO:  
+            
+        PRINT_ZERO:
             MOV AH, 2
-            MOV DL, '0'
-            INT 21H  
-            JMP LOOP_ 
-        LOOP_:  
-            LOOP OUTPUT_1
+            MOV DL, "0"
+            INT 21H
+        
+        LOOP_:
+            LOOP REVERSE_
             
-            
+        
+        PRINT_:
     MAIN ENDP
 END
-
-
- 
