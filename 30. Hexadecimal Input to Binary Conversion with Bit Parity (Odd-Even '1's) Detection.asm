@@ -1,4 +1,4 @@
-; TAKE HEX INPUT & PRINT THE BINARY OF THE HEX VALUE THEN COUNT HOW MANY ONE'S & ZERO'S ARE IN THE ANSWER. IF THERE ARE EVEN ONE'S THEN PRINT EVEN, OTHERWISE ODD
+;QUESTION:  TAKE HEX INPUT & PRINT THE BINARY OF THE HEX VALUE THEN COUNT HOW MANY ONE'S & ZERO'S ARE IN THE ANSWER. IF THERE ARE EVEN ONE'S THEN PRINT EVEN, OTHERWISE ODD
 
 
 .MODEL SMALL
@@ -15,63 +15,70 @@
         MOV AX, @DATA
         MOV DS, AX
         
-        ; SHOW MESSAGE
+       
         MOV AH, 9
         LEA DX, MSG1
         INT 21H
-
-        MOV BX, 0 
+        
+        MOV BX, 0
         MOV CL, 4
-
-        READ_HEX:
+        
+        INPUT:
             MOV AH, 1
-            INT 21H        ; READ 
-            CMP AL, 13     ; CHECK THE ENETER KEY
-            JE BINARY
-    
+            INT 21H
+            
+            
+            CMP AL, 13
+            JE OUTPUT
+            
+            ; HERE COMPARE INPUT IS DIGIT OR LETER
             CMP AL, 'A'
-            JL IS_DIGIT ; CHECK  ITS LESS THAN 37
-            SUB AL, 37H    ; For A-F ()
+            JL DIGIT     ; IF DIGIT
+            
+            SUB AL, 37H  ; 
             JMP STORE
-    
-        IS_DIGIT:
-            AND AL, 0FH    ; CONVERT INTO ASKII
-    
+       
+        DIGIT:
+            SUB AL, 30H
+        
         STORE:
-            SHL BX, CL     ; SHIFT LEFT
-            OR BL, AL      ; ADD THE HEX DIGIT
-            JMP READ_HEX
-    
-        BINARY:
+            SHL BX, 4     
+            OR BL, AL
+            JMP INPUT
+            
+            
+        OUTPUT:
             MOV AH, 9
             LEA DX, NEWLINE
             INT 21H
-    
-            ; COUNT NUMBER OF 1'S
-            MOV CX, 16     ; 16 BIT BECAUSE HEX IS 16
-            MOV SI, 0     ; Clear SI
-    
-        COUNT_ONES:
+            
+            MOV CX, 16    ; 16 BIT BECAUSE HEX IS 16
+            MOV SI, 0
+        
+        COUNT_ONE:
             SHL BX, 1
-            JNC NEXT_BIT
-            INC SI        ; INCREMENT COUNT IF CARRY SET (1 BIT)
-    
+            JNC NEXT_BIT  ; IF CF = 0 THEN NOT COUNT
+            INC SI        ; INCRIMENT COUNT
+        
         NEXT_BIT:
-            LOOP COUNT_ONES
-            TEST SI, 1     ; CHECK LAST BIT
-            JZ EVEN
-    
-            ; IF ODD
+            LOOP COUNT_ONE
+            
+            TEST SI, 1    ; CHECK LAST BIT 
+            JZ EVEN       ; IF LAST BIT ZERO THEN PRINT EVEN
+            
             MOV AH, 9
             LEA DX, ODD_MSG
             INT 21H
             JMP END_PROGRAM
-    
+            
         EVEN:
             MOV AH, 9
             LEA DX, EVEN_MSG
             INT 21H
-    
+            
+        
+            
+            
         END_PROGRAM:
             MOV AH, 4CH
             INT 21H
